@@ -1,0 +1,13 @@
+# Seed topics that steer the research. Edit freely, then:
+#   python run.py --seeds seeds.yaml
+seeds:
+  - real estate appraisal software
+  - property valuation tools for appraisers
+  - URAR / UAD form-filling software
+  - appraisal comps and market analytics tools
+  - mobile home inspection apps for appraisers
+  - appraisal workflow and order management software
+  - commercial real estate valuation software
+  - AVM automated valuation model tools
+  - appraisal report writing software
+  - sketching / floor plan tools for appraisers

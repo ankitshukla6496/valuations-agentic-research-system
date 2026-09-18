@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# Environment / secrets
+.env
+.env.local
+
+# Agent output (screenshots, raw data, catalogs) — can be large; keep out of git by default
+output/**
+!output/.gitkeep
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Playwright
+/playwright-report/
+/test-results/
