@@ -21,6 +21,21 @@ from appraiser_agent.config import config
 
 app = Flask(__name__)
 
+
+@app.before_request
+def _handle_preflight():
+    # Allow the Vercel-hosted frontend (different origin) to call this API.
+    if request.method == "OPTIONS":
+        return ("", 204)
+
+
+@app.after_request
+def _add_cors(resp):
+    resp.headers["Access-Control-Allow-Origin"] = "*"
+    resp.headers["Access-Control-Allow-Headers"] = "Content-Type"
+    resp.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+    return resp
+
 # --- shared run state -------------------------------------------------
 _state = {
     "running": False,

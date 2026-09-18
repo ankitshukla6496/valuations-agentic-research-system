@@ -106,6 +106,24 @@ Docker host; the easiest is Render.
 3. When prompted, paste your **`ANTHROPIC_API_KEY`**.
 4. Deploy. First build takes a few minutes (it installs Chromium).
 
+### Vercel + worker (hybrid) — get the app on a Vercel URL
+
+Vercel can't run the browser/agent itself, but it can host the **UI**. The engine
+runs on a small worker container; the Vercel page talks to it directly.
+
+**Step 1 — deploy the worker** (Render, per above). Note its URL, e.g.
+`https://valuations-research.onrender.com`.
+
+**Step 2 — deploy the frontend to Vercel:**
+1. In [Vercel](https://vercel.com): **Add New → Project → import this repo**.
+2. Set **Root Directory = `vercel-frontend`** (it contains a static UI + `vercel.json`).
+3. Deploy. Open the Vercel URL, paste your **Worker URL** in the top-left field
+   (it's saved in your browser), and click **▶ Run research**.
+   You can also share a pre-filled link: `https://your-app.vercel.app/?worker=https://your-worker.onrender.com`
+
+The worker enables CORS so the Vercel page can call it. This keeps full Playwright
+screenshot quality while giving you a `vercel.app` front door.
+
 ### Railway / Fly.io / any Docker host
 The included [`Dockerfile`](Dockerfile) is self-contained (Playwright base image +
 Chromium). Railway also honors the [`Procfile`](Procfile). Set `ANTHROPIC_API_KEY`

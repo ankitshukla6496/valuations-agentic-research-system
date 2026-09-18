@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Valuations — Agentic Research System</title>
+<style>
+  :root {
+    --bg: #0e1116; --panel: #171b22; --panel2: #1e242e; --border: #2a313c;
+    --text: #e6e9ef; --muted: #9aa4b2; --accent: #5b8cff; --accent2: #7c5bff;
+    --good: #38c172; --warn: #f0a020;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+    font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  header { padding: 22px 28px; border-bottom: 1px solid var(--border);
+    background: linear-gradient(90deg, #141926, #171b22); }
+  header h1 { margin: 0; font-size: 20px; letter-spacing: .2px; }
+  header p { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 24px 28px 60px; }
+  .grid { display: grid; grid-template-columns: 340px 1fr; gap: 22px; align-items: start; }
+  @media (max-width: 900px){ .grid { grid-template-columns: 1fr; } }
+  .card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 18px; }
+  label { display:block; font-size:12px; color: var(--muted); margin: 12px 0 6px; text-transform: uppercase; letter-spacing:.4px;}
+  textarea, input { width:100%; background: var(--panel2); color: var(--text);
+    border:1px solid var(--border); border-radius:8px; padding:10px; font: inherit; }
+  textarea { min-height: 130px; resize: vertical; font-size: 13px; }
+  button { margin-top:16px; width:100%; padding:12px; border:0; border-radius:8px; cursor:pointer;
+    font-weight:600; font-size:15px; color:white;
+    background: linear-gradient(90deg, var(--accent), var(--accent2)); }
+  button:disabled { opacity:.5; cursor:not-allowed; }
+  .log { background:#0a0d12; border:1px solid var(--border); border-radius:10px; padding:14px;
+    font: 12.5px/1.55 ui-monospace, SFMono-Regular, Menlo, monospace; color:#cdd6e4;
+    height: 340px; overflow:auto; white-space:pre-wrap; }
+  .status { display:flex; align-items:center; gap:8px; font-size:13px; color:var(--muted); margin-bottom:10px;}
+  .dot { width:9px; height:9px; border-radius:50%; background:#555; }
+  .dot.on { background: var(--good); box-shadow:0 0 0 4px rgba(56,193,114,.15); animation: pulse 1.4s infinite; }
+  @keyframes pulse { 50% { opacity:.4; } }
+  .summary { display:flex; gap:24px; margin:8px 0 18px; }
+  .summary .n { font-size:26px; font-weight:700; }
+  .summary .k { font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:.4px; }
+  .tools { display:grid; grid-template-columns: repeat(auto-fill, minmax(320px,1fr)); gap:18px; }
+  .tool { background:var(--panel); border:1px solid var(--border); border-radius:12px; overflow:hidden; }
+  .tool .body { padding:14px 16px; }
+  .tool h3 { margin:0 0 2px; font-size:16px; }
+  .tool .meta { color:var(--muted); font-size:12.5px; margin-bottom:8px; }
+  .pill { display:inline-block; background:var(--panel2); border:1px solid var(--border);
+    border-radius:999px; padding:2px 9px; font-size:11px; color:var(--muted); margin:0 4px 4px 0; }
+  .desc { font-size:13px; color:#c9d2df; margin:6px 0 10px; }
+  .shots { display:flex; gap:8px; overflow-x:auto; padding:10px; background:#0a0d12; border-bottom:1px solid var(--border);}
+  .shots img { height:120px; border-radius:6px; border:1px solid var(--border); cursor:pointer; transition:transform .1s; }
+  .shots img:hover { transform: scale(1.02); }
+  .noshot { color:var(--muted); font-size:12px; padding:16px; }
+  a { color: var(--accent); text-decoration:none; }
+  a:hover { text-decoration:underline; }
+  .links a { font-size:12.5px; margin-right:10px; }
+  .conf-high{color:var(--good)} .conf-low{color:var(--warn)}
+  .downloads { margin: 6px 0 0; font-size:13px; }
+  .worker { font-size:12px; }
+  .worker.bad input { border-color: var(--warn); }
+  #lightbox { position:fixed; inset:0; background:rgba(0,0,0,.85); display:none;
+    align-items:center; justify-content:center; z-index:50; padding:30px; }
+  #lightbox img { max-width:100%; max-height:100%; border-radius:8px; }
+  .hint { font-size:12px; color:var(--muted); margin-top:6px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>🔎 Valuations — Agentic Research System</h1>
+  <p>Discovers the software tools property/asset valuation appraisers use — and captures what they look like.</p>
+</header>
+
+<div class="wrap">
+  <div class="grid">
+    <!-- Controls -->
+    <div class="card">
+      <label for="worker">Worker URL (the container running the agent)</label>
+      <input id="worker" class="worker" placeholder="https://your-worker.onrender.com" />
+      <div class="hint" id="workerHint">Set this to your deployed worker. Saved in your browser.</div>
+
+      <label for="seeds">Seed topics (one per line)</label>
+      <textarea id="seeds">real estate appraisal software
+property valuation tools for appraisers
+URAR / UAD form-filling software
+appraisal comps and market analytics tools
+mobile home inspection apps for appraisers
+appraisal workflow and order management software</textarea>
+
+      <label for="maxTools">Max tools to research</label>
+      <input id="maxTools" type="number" min="1" max="100" value="15" />
+
+      <button id="runBtn">▶ Run research</button>
+    </div>
+
+    <!-- Live log + results -->
+    <div>
+      <div class="card" style="margin-bottom:18px">
+        <div class="status"><span class="dot" id="dot"></span><span id="statusText">Idle</span></div>
+        <div class="log" id="log"></div>
+      </div>
+      <div id="results"></div>
+    </div>
+  </div>
+</div>
+
+<div id="lightbox"><img id="lightboxImg" src="" alt="" /></div>
+
+<script>
+const $ = (s) => document.querySelector(s);
+const logEl = $("#log"), dot = $("#dot"), statusText = $("#statusText");
+const runBtn = $("#runBtn"), resultsEl = $("#results"), workerEl = $("#worker");
+
+// Worker URL: ?worker=... > localStorage > empty. Persisted for next time.
+const params = new URLSearchParams(location.search);
+workerEl.value = (params.get("worker") || localStorage.getItem("workerUrl") || "").replace(/\/+$/,"");
+workerEl.addEventListener("change", () => {
+  workerEl.value = workerEl.value.trim().replace(/\/+$/,"");
+  localStorage.setItem("workerUrl", workerEl.value);
+});
+
+function base(){ return workerEl.value.trim().replace(/\/+$/,""); }
+function addLog(line){ logEl.textContent += line + "\n"; logEl.scrollTop = logEl.scrollHeight; }
+function shotUrl(absPath){
+  if(!absPath) return "";
+  const i = absPath.lastIndexOf("/output/");
+  const rel = i >= 0 ? absPath.slice(i + "/output/".length) : absPath;
+  return base() + "/shots/" + rel.split("/").map(encodeURIComponent).join("/");
+}
+
+runBtn.addEventListener("click", async () => {
+  if(!base()){ addLog("⚠ Set the Worker URL first (top-left)."); workerEl.focus(); return; }
+  localStorage.setItem("workerUrl", base());
+  const seeds = $("#seeds").value;
+  const max_tools = parseInt($("#maxTools").value || "15", 10);
+  runBtn.disabled = true; resultsEl.innerHTML = ""; logEl.textContent = "";
+  dot.classList.add("on"); statusText.textContent = "Running…";
+
+  try {
+    const res = await fetch(base() + "/start", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({ seeds, max_tools })
+    });
+    if(!res.ok){ const e = await res.json().catch(()=>({})); addLog("⚠ " + (e.error||("HTTP "+res.status))); return finish(); }
+  } catch(err){
+    addLog("❌ Could not reach worker at " + base() + " — check the URL is live and reachable. " + err);
+    return finish();
+  }
+
+  const es = new EventSource(base() + "/stream");
+  es.onmessage = (ev) => {
+    const d = JSON.parse(ev.data);
+    if(d.line) addLog(d.line);
+    if(d.done){ es.close(); finish(); }
+  };
+  es.onerror = () => { es.close(); finish(); };
+});
+
+async function finish(){
+  dot.classList.remove("on"); statusText.textContent = "Finished"; runBtn.disabled = false;
+  try {
+    const r = await (await fetch(base() + "/result")).json();
+    if(r.error){ addLog("❌ " + r.error); }
+    if(r.result) renderResults(r.result);
+  } catch(e){ /* ignore */ }
+}
+
+function renderResults(result){
+  const tools = result.tools || [];
+  let html = `<div class="card"><div class="summary">
+    <div><div class="n">${result.tool_count}</div><div class="k">Tools</div></div>
+    <div><div class="n">${result.screenshot_count}</div><div class="k">Screenshots</div></div>
+    <div><div class="n" style="font-size:14px;padding-top:8px">${result.run_dir.split('/').slice(-1)[0]}</div><div class="k">Run folder</div></div>
+  </div>
+  <div class="downloads">📄 <a href="${shotUrl(result.markdown)}" target="_blank">CATALOG.md</a>
+   · <a href="${shotUrl(result.json)}" target="_blank">catalog.json</a></div>
+  </div><div class="tools" style="margin-top:18px">`;
+
+  for(const t of tools){
+    const shots = (t.sources||[]).filter(s=>s.screenshot_path);
+    const shotHtml = shots.length
+      ? `<div class="shots">${shots.map(s=>`<img loading="lazy" src="${shotUrl(s.screenshot_path)}" data-full="${shotUrl(s.screenshot_path)}" title="${(s.source_type||'')} · ${(s.title||'').replace(/"/g,'')}">`).join("")}</div>`
+      : `<div class="noshot">No screenshot captured.</div>`;
+    const feats = (t.key_features||[]).slice(0,5).map(f=>`<span class="pill">${escapeHtml(f)}</span>`).join("");
+    const confClass = t.confidence==="high"?"conf-high":(t.confidence==="low"?"conf-low":"");
+    html += `<div class="tool">${shotHtml}<div class="body">
+      <h3>${escapeHtml(t.name)}</h3>
+      <div class="meta">${escapeHtml(t.category||"—")} · <span class="${confClass}">${t.confidence}</span> confidence</div>
+      <div>${(t.platforms||[]).map(p=>`<span class="pill">${escapeHtml(p)}</span>`).join("")}</div>
+      <div class="desc">${escapeHtml(t.description||"")}</div>
+      <div>${feats}</div>
+      <div class="links" style="margin-top:8px">
+        ${t.website?`<a href="${t.website}" target="_blank">Website ↗</a>`:""}
+        ${(t.sources||[]).slice(0,3).map(s=>`<a href="${s.url}" target="_blank">${s.source_type}↗</a>`).join("")}
+      </div>
+    </div></div>`;
+  }
+  html += "</div>";
+  resultsEl.innerHTML = html;
+
+  document.querySelectorAll(".shots img").forEach(img=>{
+    img.addEventListener("click", ()=>{
+      $("#lightboxImg").src = img.dataset.full; $("#lightbox").style.display="flex";
+    });
+  });
+}
+
+$("#lightbox").addEventListener("click", ()=> $("#lightbox").style.display="none");
+function escapeHtml(s){ return (s||"").replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+</script>
+</body>
+</html>
