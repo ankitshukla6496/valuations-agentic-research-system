@@ -26,7 +26,20 @@ class Browser:
 
     def __enter__(self) -> "Browser":
         self._pw = sync_playwright().start()
-        self._browser = self._pw.chromium.launch(headless=config.headless)
+        # Container/low-memory-friendly Chromium flags. --disable-dev-shm-usage is
+        # essential in Docker (tiny /dev/shm); the rest trim memory + GPU overhead.
+        self._browser = self._pw.chromium.launch(
+            headless=config.headless,
+            args=[
+                "--disable-dev-shm-usage",
+                "--no-sandbox",
+                "--disable-gpu",
+                "--disable-extensions",
+                "--disable-background-networking",
+                "--disable-features=IsolateOrigins,site-per-process",
+                "--js-flags=--max-old-space-size=256",
+            ],
+        )
         self._context = self._browser.new_context(
             user_agent=_UA,
             viewport={"width": 1440, "height": 900},
