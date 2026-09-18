@@ -92,6 +92,41 @@ python run.py --max-tools 10       # smaller/faster run
 
 ---
 
+## Deploy (hosted)
+
+This app runs a **real headless Chromium browser** and **multi-minute jobs with
+live progress** — so it needs a persistent **container host**, not serverless
+(Vercel/Lambda can't run the browser or keep the job alive). It's ready for any
+Docker host; the easiest is Render.
+
+### Render (one-click Blueprint)
+1. Push this repo to GitHub (done).
+2. In [Render](https://render.com): **New + → Blueprint → select this repo**.
+   It reads [`render.yaml`](render.yaml).
+3. When prompted, paste your **`ANTHROPIC_API_KEY`**.
+4. Deploy. First build takes a few minutes (it installs Chromium).
+
+### Railway / Fly.io / any Docker host
+The included [`Dockerfile`](Dockerfile) is self-contained (Playwright base image +
+Chromium). Railway also honors the [`Procfile`](Procfile). Set `ANTHROPIC_API_KEY`
+in the platform's env settings.
+
+### Run the container locally
+```bash
+docker build -t valuations .
+docker run -p 8080:8080 -e ANTHROPIC_API_KEY=sk-ant-... valuations
+# open http://localhost:8080
+```
+
+> ⚠️ **Before exposing this publicly:** the Run button triggers paid Claude API
+> calls and live web scraping *from your server*. A public URL with no auth means
+> anyone can run up your API bill. For a hosted deployment, add access control
+> (a shared password / token) or keep the URL private. Also note container output
+> (`output/`) is **ephemeral** — attach a persistent disk if you need runs to survive
+> restarts.
+
+---
+
 ## Project layout
 
 ```

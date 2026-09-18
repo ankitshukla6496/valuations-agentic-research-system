@@ -1,0 +1,21 @@
+# Render Blueprint — one-click deploy from GitHub.
+# In Render: New + → "Blueprint" → pick this repo. It reads this file.
+# You'll be prompted for ANTHROPIC_API_KEY during setup.
+services:
+  - type: web
+    name: valuations-research
+    runtime: docker
+    plan: starter          # "free" also works; starter avoids cold-start sleeps
+    healthCheckPath: /
+    autoDeploy: true
+    envVars:
+      - key: ANTHROPIC_API_KEY
+        sync: false        # prompted in the Render dashboard; never committed
+      - key: AGENT_MODEL
+        value: claude-sonnet-5
+      - key: SEARCH_PROVIDER
+        value: ddgs
+      - key: MAX_TOOLS
+        value: "15"        # smaller default for a hosted demo
+      - key: HEADLESS
+        value: "true"

@@ -114,6 +114,11 @@ def shots(relpath: str):
 
 
 if __name__ == "__main__":
+    import os
+
     config.output_dir.mkdir(parents=True, exist_ok=True)
-    print("Open http://127.0.0.1:5000")
-    app.run(host="127.0.0.1", port=5000, threaded=True, debug=False)
+    # Local dev server. In production, gunicorn imports `app` (see Dockerfile).
+    port = int(os.getenv("PORT", "5000"))
+    host = os.getenv("HOST", "127.0.0.1")
+    print(f"Open http://{host}:{port}")
+    app.run(host=host, port=port, threaded=True, debug=False)
